@@ -21,16 +21,42 @@ class LevenshteinTests: XCTestCase {
         super.tearDown()
     }
     
-    func testExample() {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
+    func testLevenshteinDistance() {
+        let str1 = "aaaa"
+        let str2 = "aAａb"
+        var distance = Levenshtein.distance(str1, str2: str2, ignoreType: .All)
+        XCTAssertEqual(1, distance, "ignoreTypeがAllの場合編集距離は1")
+        var ratio = Levenshtein.normalized_distance(str1, str2: str2, ignoreType: .All)
+        XCTAssertEqual(0.75, ratio, "ignoreTypeがAllの場合類似度は0.25")
+        
+        distance = Levenshtein.distance(str1, str2: str2, ignoreType: .IgnoreCase)
+        XCTAssertEqual(2, distance, "ignoreTypeがIgnoreCaseの場合編集距離は2")
+
+        ratio = Levenshtein.normalized_distance(str1, str2: str2, ignoreType: .IgnoreCase)
+        XCTAssertEqual(0.5, ratio, "ignoreTypeがIgnoreCaseの場合類似度は0.5")
+        
+        distance = Levenshtein.distance(str1, str2: str2, ignoreType: .IgnoreWidth)
+        XCTAssertEqual(2, distance, "ignoreTypeがIgnoreWidthの場合編集距離は2")
+        
+        ratio = Levenshtein.normalized_distance(str1, str2: str2, ignoreType: .IgnoreWidth)
+        XCTAssertEqual(0.5, ratio, "ignoreTypeがIgnoreWidthの場合類似度は0.5")
+        
+        distance = Levenshtein.distance(str1, str2: str2, ignoreType: .None)
+        XCTAssertEqual(3, distance, "ignoreTypeがNoneの場合編集距離は3")
+        
+        ratio = Levenshtein.normalized_distance(str1, str2: str2, ignoreType: .None)
+        XCTAssertEqual(0.25, ratio, "ignoreTypeがNoneの場合類似度は0.25")
     }
     
-    func testPerformanceExample() {
-        // This is an example of a performance test case.
-        self.measureBlock {
-            // Put the code you want to measure the time of here.
-        }
+    func testSuggest() {
+        let sampleList = ["gmail.com", "yahoo.co.jp", "outlook.com"]
+        let testTxt = "gmaii.con"
+        
+        var suggestResult = Levenshtein.suggest(testTxt, list: sampleList, ratio: 0.6, ignoreType: .IgnoreWidth)
+        XCTAssertEqual("gmail.com", suggestResult, "ratioが0.6の場合gmail.comがサジェストされる")
+        
+        suggestResult = Levenshtein.suggest(testTxt, list: sampleList, ratio: 0.9, ignoreType: .IgnoreWidth)
+        XCTAssertNil(suggestResult, "ratioが0.9の場合nilが返る")
     }
     
 }

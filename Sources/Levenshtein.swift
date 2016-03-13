@@ -27,7 +27,7 @@ public class Levenshtein {
      
      @return Int 二つの文字列の差異
      */
-    public class func distance(str1:String, str2: String, ignoreType: LevenshteinIgnoreType) -> Int{
+    public class func distance(str1:String, str2: String, ignoreType: LevenshteinIgnoreType = .All) -> Int{
         
         var strA = str1
         var strB = str2
