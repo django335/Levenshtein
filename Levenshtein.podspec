@@ -3,9 +3,6 @@ Pod::Spec.new do |s|
   s.version          = "1.0.0"
   s.summary          = "levenshtein distance"
 
-  s.description      = <<-DESC
-                       DESC
-
   s.homepage         = "https://github.com/django335/Levenshtein"
   s.license          = 'MIT'
   s.author           = { "Naoki Morikubo" => "django0820@gmail.com" }
