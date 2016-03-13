@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D8125E011C955107000B358A /* Levenshtein.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8125E001C955107000B358A /* Levenshtein.swift */; };
 		D8447EA61C954F4500B98FC6 /* Levenshtein.h in Headers */ = {isa = PBXBuildFile; fileRef = D8447EA51C954F4500B98FC6 /* Levenshtein.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D8447EAD1C954F4500B98FC6 /* Levenshtein.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D8447EA21C954F4500B98FC6 /* Levenshtein.framework */; };
 		D8447EB21C954F4500B98FC6 /* LevenshteinTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8447EB11C954F4500B98FC6 /* LevenshteinTests.swift */; };
@@ -23,6 +24,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		D8125E001C955107000B358A /* Levenshtein.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Levenshtein.swift; sourceTree = "<group>"; };
 		D8447EA21C954F4500B98FC6 /* Levenshtein.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Levenshtein.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D8447EA51C954F4500B98FC6 /* Levenshtein.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Levenshtein.h; sourceTree = "<group>"; };
 		D8447EA71C954F4500B98FC6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -73,6 +75,7 @@
 			children = (
 				D8447EA51C954F4500B98FC6 /* Levenshtein.h */,
 				D8447EA71C954F4500B98FC6 /* Info.plist */,
+				D8125E001C955107000B358A /* Levenshtein.swift */,
 			);
 			name = Levenshtein;
 			path = Sources;
@@ -196,6 +199,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D8125E011C955107000B358A /* Levenshtein.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -310,6 +314,7 @@
 		D8447EB71C954F4500B98FC6 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -320,12 +325,14 @@
 				PRODUCT_BUNDLE_IDENTIFIER = jp.co.django335.Levenshtein;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
 		};
 		D8447EB81C954F4500B98FC6 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
