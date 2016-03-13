@@ -5,11 +5,10 @@
 [![License](https://img.shields.io/cocoapods/l/Levenshtein.svg?style=flat)](http://cocoapods.org/pods/Levenshtein)
 [![Platform](https://img.shields.io/cocoapods/p/Levenshtein.svg?style=flat)](http://cocoapods.org/pods/Levenshtein)
 
-## Usage
-
-To run the example project, clone the repo, and run `pod install` from the Example directory first.
 
 ## Requirements
+
+iOS 8.0+
 
 ## Installation
 
