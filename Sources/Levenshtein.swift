@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import CoreFoundation
 
 public enum LevenshteinIgnoreType : Int{
     case None
@@ -33,28 +34,39 @@ public class Levenshtein {
         var strB = str2
         let strASize = strA.characters.count
         let strBSize = strB.characters.count
-        
+
         if strASize == 0 && strBSize == 0 { return 0 }
         if strBSize == 0 { return strASize }
         if strASize == 0 { return strBSize }
-        
+
         if ignoreType != .None {
             if ignoreType == .IgnoreCase || ignoreType == .All {
                 strA = strA.lowercaseString
                 strB = strB.lowercaseString
             }
             if ignoreType == .IgnoreWidth || ignoreType == .All {
+
+            #if os(Linux)
+                var mutableStr = NSMutableString(string: strA)
+                var mutableCfStr:CFMutableString = unsafeBitCast(mutableStr, CFMutableString.self)
+                CFStringTransform(mutableCfStr, nil, kCFStringTransformFullwidthHalfwidth, false)
+                strA = String(mutableCfStr)
+
+                mutableStr = NSMutableString(string: strB)
+                mutableCfStr = unsafeBitCast(mutableStr, CFMutableString.self)
+                CFStringTransform(mutableCfStr, nil, kCFStringTransformFullwidthHalfwidth, false)
+                strB = String(mutableCfStr)
+            #else
                 var mutableStr = NSMutableString(string: strA) as CFMutableString
                 CFStringTransform(mutableStr, nil, kCFStringTransformFullwidthHalfwidth, false)
                 strA = mutableStr as String
-                
+
                 mutableStr = NSMutableString(string: strB) as CFMutableString
                 CFStringTransform(mutableStr, nil, kCFStringTransformFullwidthHalfwidth, false)
                 strB = mutableStr as String
+            #endif
             }
         }
-        
-        //        print("\(strA) \(strASize): \(strB) \(strBSize)")
         
         var matrix = [[Int]]()
         for i in 0...strASize {
@@ -75,9 +87,7 @@ public class Levenshtein {
                 matrix[j].append(min(m,n,l))
             }
         }
-        
-        //        print(matrix)
-        
+
         return matrix[strASize][strBSize]
     }
     
@@ -118,9 +128,9 @@ public class Levenshtein {
     public class func suggest(str:String, list:Array<String>, ratio: Double, ignoreType: LevenshteinIgnoreType) -> String? {
         if str.characters.count == 0 { return nil }
         if list.count == 0 { return nil }
-        
+
         var suggestData: (text: String?, ratio: Double) = (nil, 0.0)
-        
+
         for v in list {
             let resultRatio = self.normalized_distance(str, str2: v, ignoreType: ignoreType)
             if resultRatio > ratio && resultRatio > suggestData.ratio {
@@ -128,7 +138,7 @@ public class Levenshtein {
                 suggestData.ratio = resultRatio
             }
         }
-        
+
         if suggestData.text != nil {
             return suggestData.text
         }else{
