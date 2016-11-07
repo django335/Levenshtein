@@ -9,78 +9,79 @@
 import Foundation
 import CoreFoundation
 
-public enum LevenshteinIgnoreType : Int{
-    case None
-    case IgnoreCase
-    case IgnoreWidth
-    case All
+ public struct LevenshteinIgnoreType : OptionSetType {
+  public let rawValue: Int
+  public init(rawValue: Int) { self.rawValue = rawValue }
+
+  static let IgnoreCase  = LevenshteinIgnoreType(rawValue: 0x1 << 0)
+  static let IgnoreWidth = LevenshteinIgnoreType(rawValue: 0x1 << 1)
+  static let All = LevenshteinIgnoreType([IgnoreCase, IgnoreWidth])
 }
 
 public class Levenshtein {
     /**
      二つの文字列が同一になる編集距離を返却する
-     
-     @param str1 一つ目の比較文字列
-     
-     @param str2 二つ目の比較文字列
-     
+
+     @param lhs 左辺の比較文字列
+
+     @param rhs 右辺の比較文字列
+
      @param ignoreType 比較時に許容する文字種差異を指定
-     
+
      @return Int 二つの文字列の差異
      */
-    public class func distance(str1:String, str2: String, ignoreType: LevenshteinIgnoreType = .All) -> Int{
-        
-        var strA = str1
-        var strB = str2
-        let strASize = strA.characters.count
-        let strBSize = strB.characters.count
+    public class func distance(var lhs lhs:String, var rhs: String, ignoreType: LevenshteinIgnoreType = []) -> Int{
 
-        if strASize == 0 && strBSize == 0 { return 0 }
-        if strBSize == 0 { return strASize }
-        if strASize == 0 { return strBSize }
+        let lhsSize = lhs.characters.count
+        let rhsSize = rhs.characters.count
 
-        if ignoreType != .None {
-            if ignoreType == .IgnoreCase || ignoreType == .All {
-                strA = strA.lowercaseString
-                strB = strB.lowercaseString
-            }
-            if ignoreType == .IgnoreWidth || ignoreType == .All {
+        if lhsSize == 0 && rhsSize == 0 { return 0 }
+        if rhsSize == 0 { return lhsSize }
+        if lhsSize == 0 { return rhsSize }
 
-            #if os(Linux)
-                var mutableStr = NSMutableString(string: strA)
-                var mutableCfStr:CFMutableString = unsafeBitCast(mutableStr, CFMutableString.self)
-                CFStringTransform(mutableCfStr, nil, kCFStringTransformFullwidthHalfwidth, false)
-                strA = String(mutableCfStr)
 
-                mutableStr = NSMutableString(string: strB)
-                mutableCfStr = unsafeBitCast(mutableStr, CFMutableString.self)
-                CFStringTransform(mutableCfStr, nil, kCFStringTransformFullwidthHalfwidth, false)
-                strB = String(mutableCfStr)
-            #else
-                var mutableStr = NSMutableString(string: strA) as CFMutableString
-                CFStringTransform(mutableStr, nil, kCFStringTransformFullwidthHalfwidth, false)
-                strA = mutableStr as String
-
-                mutableStr = NSMutableString(string: strB) as CFMutableString
-                CFStringTransform(mutableStr, nil, kCFStringTransformFullwidthHalfwidth, false)
-                strB = mutableStr as String
-            #endif
-            }
+        if ignoreType.contains(.IgnoreCase) {
+          lhs = lhs.lowercaseString
+          rhs = rhs.lowercaseString
         }
-        
+
+        if ignoreType.contains(.IgnoreWidth) {
+          #if os(Linux)
+            var mutableStr = NSMutableString(string: lhs)
+            var mutableCfStr:CFMutableString = unsafeBitCast(mutableStr, CFMutableString.self)
+            CFStringTransform(mutableCfStr, nil, kCFStringTransformFullwidthHalfwidth, false)
+            lhs = String(mutableCfStr)
+
+            mutableStr = NSMutableString(string: rhs)
+            mutableCfStr = unsafeBitCast(mutableStr, CFMutableString.self)
+            CFStringTransform(mutableCfStr, nil, kCFStringTransformFullwidthHalfwidth, false)
+            rhs = String(mutableCfStr)
+          #else
+            var mutableStr = NSMutableString(string: lhs) as CFMutableString
+            CFStringTransform(mutableStr, nil, kCFStringTransformFullwidthHalfwidth, false)
+            lhs = mutableStr as String
+
+            mutableStr = NSMutableString(string: rhs) as CFMutableString
+            CFStringTransform(mutableStr, nil, kCFStringTransformFullwidthHalfwidth, false)
+            rhs = mutableStr as String
+          #endif
+        }
+
+
         var matrix = [[Int]]()
-        for i in 0...strASize {
+        for i in 0...lhsSize {
             matrix.append([i])
         }
-        for i in 1...strBSize {
+
+        for i in 1...rhsSize {
             matrix[0].append(i)
         }
         
-        for i in 1...strBSize {
-            for j in 1...strASize {
-                let idxA = strA.startIndex.advancedBy(j-1)
-                let idxB = strB.startIndex.advancedBy(i-1)
-                let x = (strA[idxA] == strB[idxB]) ? 0 : 1
+        for i in 1...rhsSize {
+            for j in 1...lhsSize {
+                let idxLhs = lhs.startIndex.advancedBy(j-1)
+                let idxRhs = rhs.startIndex.advancedBy(i-1)
+                let x = (lhs[idxLhs] == rhs[idxRhs]) ? 0 : 1
                 let m = matrix[j-1][i] + 1
                 let n = matrix[j][i-1] + 1
                 let l = matrix[j-1][i-1] + x
@@ -88,26 +89,25 @@ public class Levenshtein {
             }
         }
 
-        return matrix[strASize][strBSize]
+        return matrix[lhsSize][rhsSize]
     }
     
     /**
      二つの文字列の類似度を返却する
-     
-     @param str1 一つ目の比較文字列
-     
-     @param str2 二つ目の比較文字列
-     
+
+     @param lhs 左辺の比較文字列
+
+     @param rhs 右辺の比較文字列
+
      @param ignoreType 比較時に許容する文字種差異を指定
-     
+
      @return Double 二つの文字列の類似度
      */
-    public class func normalized_distance(str1:String, str2: String, ignoreType: LevenshteinIgnoreType) -> Double {
-        let maxlength = max(str1.characters.count, str2.characters.count)
-        if maxlength == 0 {
-            return 0.0
-        }
-        let distance = self.distance(str1, str2: str2, ignoreType: ignoreType)
+    public class func normalized_distance(lhs lhs:String, rhs: String, ignoreType: LevenshteinIgnoreType = []) -> Double {
+        let maxlength = max(lhs.characters.count, rhs.characters.count)
+        guard maxlength > 0 else { return 0.0 }
+
+        let distance = self.distance(lhs: lhs, rhs: rhs, ignoreType: ignoreType)
         let ratio = 1.0 - (Double(distance) / Double(maxlength))
         return ratio
     }
@@ -116,33 +116,28 @@ public class Levenshtein {
      対象文字列に最も近い候補をリストから抽出、返却する
      
      @param str 検査対象文字列
-     
+
      @param list 候補文字列リスト
-     
+
      @param ratio サジェスト対象にする下限類似度
-     
+
      @param ignoreType 比較時に許容する文字種差異を指定
-     
+
      @return String? サジェスト対象を返却。候補文字列が存在しない場合はnilを返す。
      */
     public class func suggest(str:String, list:Array<String>, ratio: Double, ignoreType: LevenshteinIgnoreType) -> String? {
-        if str.characters.count == 0 { return nil }
-        if list.count == 0 { return nil }
+        guard str.characters.count > 0 && list.count > 0 else { return nil }
 
         var suggestData: (text: String?, ratio: Double) = (nil, 0.0)
 
         for v in list {
-            let resultRatio = self.normalized_distance(str, str2: v, ignoreType: ignoreType)
+          let resultRatio = self.normalized_distance(lhs: str, rhs: v, ignoreType: ignoreType)
             if resultRatio > ratio && resultRatio > suggestData.ratio {
                 suggestData.text = v
                 suggestData.ratio = resultRatio
             }
         }
 
-        if suggestData.text != nil {
-            return suggestData.text
-        }else{
-            return nil
-        }
+        return suggestData.text
     }
 }

@@ -22,30 +22,31 @@ class LevenshteinTests: XCTestCase {
     }
     
     func testLevenshteinDistance() {
-        let str1 = "aaaa"
-        let str2 = "aAａb"
-        var distance = Levenshtein.distance(str1, str2: str2, ignoreType: .All)
+        let lhs = "aaaa"
+        let rhs = "aAａb"
+        var distance = Levenshtein.distance(lhs: lhs, rhs: rhs, ignoreType: .All)
         XCTAssertEqual(1, distance, "ignoreTypeがAllの場合編集距離は1")
-        var ratio = Levenshtein.normalized_distance(str1, str2: str2, ignoreType: .All)
+
+        var ratio = Levenshtein.normalized_distance(lhs: lhs, rhs: rhs, ignoreType: .All)
         XCTAssertEqual(0.75, ratio, "ignoreTypeがAllの場合類似度は0.25")
         
-        distance = Levenshtein.distance(str1, str2: str2, ignoreType: .IgnoreCase)
+        distance = Levenshtein.distance(lhs: lhs, rhs: rhs, ignoreType: .IgnoreCase)
         XCTAssertEqual(2, distance, "ignoreTypeがIgnoreCaseの場合編集距離は2")
 
-        ratio = Levenshtein.normalized_distance(str1, str2: str2, ignoreType: .IgnoreCase)
+        ratio = Levenshtein.normalized_distance(lhs: lhs, rhs: rhs, ignoreType: .IgnoreCase)
         XCTAssertEqual(0.5, ratio, "ignoreTypeがIgnoreCaseの場合類似度は0.5")
         
-        distance = Levenshtein.distance(str1, str2: str2, ignoreType: .IgnoreWidth)
+        distance = Levenshtein.distance(lhs: lhs, rhs: rhs, ignoreType: .IgnoreWidth)
         XCTAssertEqual(2, distance, "ignoreTypeがIgnoreWidthの場合編集距離は2")
         
-        ratio = Levenshtein.normalized_distance(str1, str2: str2, ignoreType: .IgnoreWidth)
+        ratio = Levenshtein.normalized_distance(lhs: lhs, rhs: rhs, ignoreType: .IgnoreWidth)
         XCTAssertEqual(0.5, ratio, "ignoreTypeがIgnoreWidthの場合類似度は0.5")
         
-        distance = Levenshtein.distance(str1, str2: str2, ignoreType: .None)
-        XCTAssertEqual(3, distance, "ignoreTypeがNoneの場合編集距離は3")
+        distance = Levenshtein.distance(lhs: lhs, rhs: rhs)
+        XCTAssertEqual(3, distance, "ignoreTypeが未設定の場合編集距離は3")
         
-        ratio = Levenshtein.normalized_distance(str1, str2: str2, ignoreType: .None)
-        XCTAssertEqual(0.25, ratio, "ignoreTypeがNoneの場合類似度は0.25")
+        ratio = Levenshtein.normalized_distance(lhs: lhs, rhs: rhs)
+        XCTAssertEqual(0.25, ratio, "ignoreTypeが未設定の場合類似度は0.25")
     }
     
     func testSuggest() {
@@ -57,6 +58,12 @@ class LevenshteinTests: XCTestCase {
         
         suggestResult = Levenshtein.suggest(testTxt, list: sampleList, ratio: 0.9, ignoreType: .IgnoreWidth)
         XCTAssertNil(suggestResult, "ratioが0.9の場合nilが返る")
+
+        suggestResult = Levenshtein.suggest("", list: sampleList, ratio: 0.9, ignoreType: .IgnoreWidth)
+        XCTAssertNil(suggestResult, "strが空文字の場合nilが返る")
+
+        suggestResult = Levenshtein.suggest(testTxt, list: [], ratio: 0.9, ignoreType: .IgnoreWidth)
+        XCTAssertNil(suggestResult, "listが空配列の場合nilが返る")
     }
     
 }
