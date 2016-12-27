@@ -10,13 +10,13 @@ import Foundation
 import CoreFoundation
 
 public enum LevenshteinIgnoreType : Int{
-    case None
-    case IgnoreCase
-    case IgnoreWidth
-    case All
+    case none
+    case ignoreCase
+    case ignoreWidth
+    case all
 }
 
-public class Levenshtein {
+open class Levenshtein {
     /**
      二つの文字列が同一になる編集距離を返却する
      
@@ -28,7 +28,7 @@ public class Levenshtein {
      
      @return Int 二つの文字列の差異
      */
-    public class func distance(str1:String, str2: String, ignoreType: LevenshteinIgnoreType = .All) -> Int{
+    open class func distance(_ str1:String, str2: String, ignoreType: LevenshteinIgnoreType = .all) -> Int{
         
         var strA = str1
         var strB = str2
@@ -39,12 +39,12 @@ public class Levenshtein {
         if strBSize == 0 { return strASize }
         if strASize == 0 { return strBSize }
 
-        if ignoreType != .None {
-            if ignoreType == .IgnoreCase || ignoreType == .All {
-                strA = strA.lowercaseString
-                strB = strB.lowercaseString
+        if ignoreType != .none {
+            if ignoreType == .ignoreCase || ignoreType == .all {
+                strA = strA.lowercased()
+                strB = strB.lowercased()
             }
-            if ignoreType == .IgnoreWidth || ignoreType == .All {
+            if ignoreType == .ignoreWidth || ignoreType == .all {
 
             #if os(Linux)
                 var mutableStr = NSMutableString(string: strA)
@@ -78,8 +78,8 @@ public class Levenshtein {
         
         for i in 1...strBSize {
             for j in 1...strASize {
-                let idxA = strA.startIndex.advancedBy(j-1)
-                let idxB = strB.startIndex.advancedBy(i-1)
+                let idxA = strA.characters.index(strA.startIndex, offsetBy: j-1)
+                let idxB = strB.characters.index(strB.startIndex, offsetBy: i-1)
                 let x = (strA[idxA] == strB[idxB]) ? 0 : 1
                 let m = matrix[j-1][i] + 1
                 let n = matrix[j][i-1] + 1
@@ -102,7 +102,7 @@ public class Levenshtein {
      
      @return Double 二つの文字列の類似度
      */
-    public class func normalized_distance(str1:String, str2: String, ignoreType: LevenshteinIgnoreType) -> Double {
+    open class func normalized_distance(_ str1:String, str2: String, ignoreType: LevenshteinIgnoreType) -> Double {
         let maxlength = max(str1.characters.count, str2.characters.count)
         if maxlength == 0 {
             return 0.0
@@ -125,7 +125,7 @@ public class Levenshtein {
      
      @return String? サジェスト対象を返却。候補文字列が存在しない場合はnilを返す。
      */
-    public class func suggest(str:String, list:Array<String>, ratio: Double, ignoreType: LevenshteinIgnoreType) -> String? {
+    open class func suggest(_ str:String, list:Array<String>, ratio: Double, ignoreType: LevenshteinIgnoreType) -> String? {
         if str.characters.count == 0 { return nil }
         if list.count == 0 { return nil }
 
