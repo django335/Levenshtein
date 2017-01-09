@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = "Levenshtein"
-  s.version          = "1.1.0"
+  s.version          = "1.2.0"
   s.summary          = "levenshtein distance"
 
   s.homepage         = "https://github.com/django335/Levenshtein"
